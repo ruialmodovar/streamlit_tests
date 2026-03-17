@@ -16,7 +16,19 @@ if file:
     # =========================
     # CÁLCULOS
     # =========================
+    required_cols = ["novo_rateio", "saldo_atual", "consumo_medio", "UC"]
+    missing_cols = [c for c in required_cols if c not in df.columns]
+    if missing_cols:
+        st.error(
+            "Colunas obrigatórias ausentes na planilha. Verifique a aba 'Rateio_Proposto'."
+        )
+        st.write("Colunas existentes:", list(df.columns))
+        st.write("Colunas faltantes:", missing_cols)
+        st.stop()
+
     GERACAO_MWH = 300
+    # Garantir que consumo_medio não contenha zeros para evitar divisão por zero
+    df["consumo_medio"] = df["consumo_medio"].replace(0, np.nan)
 
     df["energia_alocada"] = df["novo_rateio"] * GERACAO_MWH / 100
     df["saldo_pos"] = df["saldo_atual"] + df["energia_alocada"] - df["consumo_medio"]
